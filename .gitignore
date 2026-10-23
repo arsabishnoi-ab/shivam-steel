@@ -17,6 +17,12 @@
 /.next/
 /out/
 
+# Brochure copied into public at build time so Vercel serves it at /
+/public/brochure/
+/public/css/
+/public/js/
+/public/assets/
+
 # production
 /build
 

@@ -3,6 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: "/", destination: "/brochure/index.html" },
+      ],
+    };
+  },
   images: {
     remotePatterns: [
       {
