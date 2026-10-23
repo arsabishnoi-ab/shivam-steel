@@ -103,6 +103,7 @@ function openMenu() {
   menuToggle?.setAttribute("aria-expanded", "true");
   menuToggle?.setAttribute("aria-label", "Close menu");
   if (menuToggle) menuToggle.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
+  onHeaderScroll();
 }
 
 menuToggle?.addEventListener("click", () => {
@@ -111,7 +112,17 @@ menuToggle?.addEventListener("click", () => {
 });
 
 document.querySelectorAll(".nav a").forEach((link) => {
-  link.addEventListener("click", () => closeMenu());
+  link.addEventListener("click", (event) => {
+    const id = link.getAttribute("href");
+    closeMenu();
+    if (!id || !id.startsWith("#")) return;
+    const target = document.querySelector(id);
+    if (!target) return;
+    event.preventDefault();
+    window.requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
 });
 
 window.addEventListener("resize", () => {
@@ -226,8 +237,10 @@ document.querySelectorAll(".filters [data-filter]").forEach((button) => {
 document.querySelectorAll(".dropdown [data-filter]").forEach((button) => {
   button.addEventListener("click", () => {
     setFilter(button.dataset.filter);
-    document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
     closeMenu();
+    window.requestAnimationFrame(() => {
+      document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   });
 });
 
@@ -248,13 +261,37 @@ function closeLightbox() {
   if (lightboxImg) lightboxImg.removeAttribute("src");
 }
 
+let lightboxIndex = 0;
+
+function galleryCards() {
+  return [...document.querySelectorAll(".product:not(.is-hidden)")];
+}
+
 function openLightbox(src, name) {
   if (!lightbox || !lightboxImg || !lightboxCaption) return;
+  const cards = galleryCards();
+  const match = cards.findIndex((card) => {
+    const image = card.querySelector("img");
+    return image && (image.src === src || card.dataset.name === name);
+  });
+  if (match >= 0) lightboxIndex = match;
   lightboxImg.src = src;
   lightboxImg.alt = name;
   lightboxCaption.textContent = name;
   lightbox.hidden = false;
   document.body.classList.add("lightbox-open");
+}
+
+function stepLightbox(delta) {
+  const cards = galleryCards();
+  if (!cards.length || !lightbox || lightbox.hidden) return;
+  lightboxIndex = (lightboxIndex + delta + cards.length) % cards.length;
+  const card = cards[lightboxIndex];
+  const image = card.querySelector("img");
+  if (!image) return;
+  lightboxImg.src = image.src;
+  lightboxImg.alt = card.dataset.name || image.alt || "";
+  lightboxCaption.textContent = card.dataset.name || image.alt || "";
 }
 
 document.querySelectorAll(".product").forEach((card) => {
@@ -266,14 +303,44 @@ document.querySelectorAll(".product").forEach((card) => {
 });
 
 lightbox?.addEventListener("click", (event) => {
+  if (event.target.closest(".lightbox-nav.prev")) {
+    stepLightbox(-1);
+    return;
+  }
+  if (event.target.closest(".lightbox-nav.next")) {
+    stepLightbox(1);
+    return;
+  }
   if (event.target === lightbox || event.target.closest(".lightbox-close")) closeLightbox();
 });
+
+function watchSwipe(element, onSwipe) {
+  if (!element) return;
+  let startX = 0;
+  let startY = 0;
+  element.addEventListener("touchstart", (event) => {
+    const touch = event.changedTouches[0];
+    startX = touch.clientX;
+    startY = touch.clientY;
+  }, { passive: true });
+  element.addEventListener("touchend", (event) => {
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+    onSwipe(dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
+
+watchSwipe(lightbox, (direction) => stepLightbox(direction));
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeLightbox();
     closeMenu();
   }
+  if (event.key === "ArrowRight" && lightbox && !lightbox.hidden) stepLightbox(1);
+  if (event.key === "ArrowLeft" && lightbox && !lightbox.hidden) stepLightbox(-1);
 });
 
 const slides = [...document.querySelectorAll(".hero-slide")];
@@ -321,6 +388,11 @@ dots.forEach((dot, index) => {
     showSlide(index);
     startHero();
   });
+});
+
+watchSwipe(document.querySelector(".hero"), (direction) => {
+  showSlide(heroIndex + direction);
+  startHero();
 });
 
 document.addEventListener("visibilitychange", () => {
