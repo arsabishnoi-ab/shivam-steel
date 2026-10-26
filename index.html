@@ -13,10 +13,10 @@
   <meta property="og:locale" content="en_IN">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="icon" href="assets/images/logo.png">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=20261026b">
   <link rel="preload" as="image" href="assets/images/hero-rail-01.jpg">
   <script type="application/ld+json">
   {
@@ -789,14 +789,16 @@
   <section class="section" id="reviews">
     <div class="container">
       <h2 class="section-title">Reviews</h2>
-      <div class="reviews-brand">
-        <strong>Shivam Steel Railing &amp; Furniture</strong>
-        <div class="reviews-summary" id="reviews-summary"></div>
-      </div>
-      <div class="reviews-grid" id="reviews-grid"></div>
-      <p class="empty-note" id="reviews-empty">Customer reviews will be added here.</p>
-      <div class="center-btn">
-        <button class="btn" id="view-more" type="button" hidden>View more</button>
+      <div class="g-reviews">
+        <div class="reviews-brand">
+          <strong>Shivam Steel Railing &amp; Furniture</strong>
+          <div class="reviews-summary" id="reviews-summary"></div>
+        </div>
+        <div class="reviews-grid" id="reviews-grid"></div>
+        <p class="empty-note" id="reviews-empty">Customer reviews will be added here.</p>
+        <div class="center-btn">
+          <button class="reviews-more" id="view-more" type="button" hidden>More reviews</button>
+        </div>
       </div>
     </div>
   </section>
@@ -905,7 +907,7 @@
     </figure>
   </div>
 
-  <script src="js/reviews.js"></script>
+  <script src="js/reviews.js?v=20261026b"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

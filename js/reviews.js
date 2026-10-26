@@ -14,11 +14,11 @@ const firstNames = [
 ];
 
 const lastNames = [
-  "Rao", "Shetty", "Reddy", "Gowda", "Iyer", "Nair", "Kulkarni", "Patil",
-  "Hegde", "Jain", "Khan", "D'Souza", "Pinto", "Bhat", "Murthy", "Sharma",
-  "Verma", "Singh", "Das", "Menon", "Pillai", "Naidu", "Chowdhury", "Banerjee",
-  "Krishnan", "Subramanian", "Fernandes", "Lobo", "Ali", "Hussain", "Joshi", "Deshpande",
-  "Kamath", "Pai", "Acharya", "Urs", "Setty", "Gupta", "Agarwal", "Thomas",
+  "Shetty", "Reddy", "Gowda", "Iyer", "Nair", "Kulkarni", "Patil", "Hegde",
+  "Jain", "Khan", "D'Souza", "Pinto", "Bhat", "Murthy", "Sharma", "Verma",
+  "Singh", "Das", "Menon", "Pillai", "Naidu", "Chowdhury", "Banerjee", "Krishnan",
+  "Subramanian", "Fernandes", "Lobo", "Ali", "Hussain", "Joshi", "Deshpande", "Kamath",
+  "Pai", "Acharya", "Urs", "Setty", "Gupta", "Agarwal", "Thomas", "Pereira",
 ];
 
 const places = [
@@ -146,19 +146,47 @@ function relativeTime(value) {
   return `${Math.round(days / 365)} years ago`;
 }
 
+const STAR_PATH = "M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z";
+
+function ensureHalfStar() {
+  if (document.getElementById("g-star-half")) return;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", "0");
+  svg.setAttribute("height", "0");
+  svg.setAttribute("aria-hidden", "true");
+  const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+  const gradient = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+  gradient.id = "g-star-half";
+  const gold = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+  gold.setAttribute("offset", "50%");
+  gold.setAttribute("stop-color", "#FBBC04");
+  const empty = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+  empty.setAttribute("offset", "50%");
+  empty.setAttribute("stop-color", "#E8EAED");
+  gradient.append(gold, empty);
+  defs.append(gradient);
+  svg.append(defs);
+  document.body.append(svg);
+}
+
 function starIcons(rating) {
+  ensureHalfStar();
   const wrap = document.createElement("span");
   wrap.className = "stars";
   const safe = Math.max(0, Math.min(5, Number(rating) || 0));
   wrap.setAttribute("aria-label", `${safe} out of 5`);
   for (let step = 1; step <= 5; step += 1) {
-    const icon = document.createElement("i");
     const filled = safe - (step - 1);
-    icon.setAttribute("aria-hidden", "true");
-    if (filled >= 1) icon.className = "fa-solid fa-star";
-    else if (filled >= 0.5) icon.className = "fa-solid fa-star-half-stroke";
-    else icon.className = "fa-regular fa-star";
-    wrap.append(icon);
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", STAR_PATH);
+    if (filled >= 1) path.setAttribute("fill", "#FBBC04");
+    else if (filled >= 0.5) path.setAttribute("fill", "url(#g-star-half)");
+    else path.setAttribute("fill", "#E8EAED");
+    svg.append(path);
+    wrap.append(svg);
   }
   return wrap;
 }
