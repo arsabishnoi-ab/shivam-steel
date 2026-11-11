@@ -6,8 +6,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        { source: "/", destination: "/offline.html" },
-        { source: "/((?!offline\\.html$).*)", destination: "/offline.html" },
+        { source: "/", destination: "/brochure/index.html" },
       ],
     };
   },
